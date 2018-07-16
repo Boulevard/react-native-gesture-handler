@@ -12,6 +12,8 @@ public class LongPressGestureHandler extends GestureHandler<LongPressGestureHand
   private long mMinDurationMs = DEFAULT_MIN_DURATION_MS;
   private float mMaxDistSq;
   private float mStartX, mStartY;
+  private float mLastX, mLastY;
+  private float mLastEventOffsetX, mLastEventOffsetY;
   private Handler mHandler;
 
   public LongPressGestureHandler(Context context) {
@@ -30,6 +32,11 @@ public class LongPressGestureHandler extends GestureHandler<LongPressGestureHand
 
   @Override
   protected void onHandle(MotionEvent event) {
+    mLastX = GestureUtils.getLastPointerX(event, true);
+    mLastY = GestureUtils.getLastPointerY(event, true);
+    mLastEventOffsetX = event.getRawX() - event.getX();
+    mLastEventOffsetY = event.getRawY() - event.getY();
+
     if (getState() == STATE_UNDETERMINED) {
       begin();
       mStartX = event.getRawX();
@@ -69,5 +76,21 @@ public class LongPressGestureHandler extends GestureHandler<LongPressGestureHand
       mHandler.removeCallbacksAndMessages(null);
       mHandler = null;
     }
+  }
+
+  public float getLastAbsolutePositionX() {
+    return mLastX;
+  }
+
+  public float getLastAbsolutePositionY() {
+    return mLastY;
+  }
+
+  public float getLastRelativePositionX() {
+    return mLastX - mLastEventOffsetX;
+  }
+
+  public float getLastRelativePositionY() {
+    return mLastY - mLastEventOffsetY;
   }
 }
